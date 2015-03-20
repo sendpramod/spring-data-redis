@@ -200,7 +200,10 @@ public class RedisTemplate<K, V> extends RedisAccessor implements RedisOperation
 		} finally {
 
 			if (enableTransactionSupport) {
-				RedisConnectionUtils.unbindConnection(factory);
+
+				if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+					RedisConnectionUtils.unbindConnection(factory);
+				}
 			} else {
 				RedisConnectionUtils.releaseConnection(conn, factory);
 			}

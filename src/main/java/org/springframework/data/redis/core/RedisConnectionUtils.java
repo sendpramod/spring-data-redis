@@ -158,7 +158,8 @@ public abstract class RedisConnectionUtils {
 				RedisConnection conn = connHolder.getConnection();
 				conn.multi();
 
-				TransactionSynchronizationManager.registerSynchronization(new RedisTransactionSynchronizer(connHolder, conn));
+				TransactionSynchronizationManager.registerSynchronization(new RedisTransactionSynchronizer(connHolder, conn,
+						factory));
 			}
 		}
 	}
@@ -252,7 +253,8 @@ public abstract class RedisConnectionUtils {
 	}
 
 	/**
-	 * A {@link TransactionSynchronizationAdapter} that makes sure that the associated RedisConnection is released after the transaction completes.
+	 * A {@link TransactionSynchronizationAdapter} that makes sure that the associated RedisConnection is released after
+	 * the transaction completes.
 	 * 
 	 * @author Christoph Strobl
 	 * @author Thomas Darimont
@@ -261,17 +263,21 @@ public abstract class RedisConnectionUtils {
 		
 		private final RedisConnectionHolder connHolder;
 		private final RedisConnection connection;
+		private final RedisConnectionFactory factory;
 
 		/**
 		 * Creates a new {@link RedisTransactionSynchronizer}.
 		 * 
 		 * @param connHolder
 		 * @param connection
+		 * @param factory
 		 */
-		private RedisTransactionSynchronizer(RedisConnectionHolder connHolder, RedisConnection connection) {
-			
+		private RedisTransactionSynchronizer(RedisConnectionHolder connHolder, RedisConnection connection,
+				RedisConnectionFactory factory) {
+
 			this.connHolder = connHolder;
 			this.connection = connection;
+			this.factory = factory;
 		}
 
 		@Override
@@ -297,6 +303,7 @@ public abstract class RedisConnectionUtils {
 				
 				connHolder.setTransactionSyncronisationActive(false);
 				connection.close();
+				TransactionSynchronizationManager.unbindResource(factory);
 			}
 		}
 	}
