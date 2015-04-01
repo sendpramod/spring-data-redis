@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2015 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ public abstract class RedisConnectionUtils {
 
 			if (!connHolder.isTransactionSyncronisationActive()) {
 				connHolder.setTransactionSyncronisationActive(true);
-				
+
 				RedisConnection conn = connHolder.getConnection();
 				conn.multi();
 
@@ -260,7 +260,7 @@ public abstract class RedisConnectionUtils {
 	 * @author Thomas Darimont
 	 */
 	private static class RedisTransactionSynchronizer extends TransactionSynchronizationAdapter {
-		
+
 		private final RedisConnectionHolder connHolder;
 		private final RedisConnection connection;
 		private final RedisConnectionFactory factory;
@@ -300,7 +300,7 @@ public abstract class RedisConnectionUtils {
 				if (log.isDebugEnabled()) {
 					log.debug("Closing bound connection after transaction completed with " + status);
 				}
-				
+
 				connHolder.setTransactionSyncronisationActive(false);
 				connection.close();
 				TransactionSynchronizationManager.unbindResource(factory);

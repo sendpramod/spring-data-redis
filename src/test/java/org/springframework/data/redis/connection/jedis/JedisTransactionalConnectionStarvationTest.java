@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,38 +30,45 @@ import org.springframework.test.context.ContextConfiguration;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * @author Michael Farmer
  * @author Thomas Darimont
- * @see DATAREDIS-332
  */
 @ContextConfiguration(classes = { PooledJedisContextConfiguration.class })
 public class JedisTransactionalConnectionStarvationTest extends AbstractTransactionalTestBase {
 
 	protected static final int MAX_CONNECTIONS = 5;
 
-	@Autowired private StringRedisTemplate srt;
+	@Autowired StringRedisTemplate template;
 
 	protected void tryOperations(int numOperationsToTry) {
 
-		ValueOperations<String, String> ops = srt.opsForValue();
+		ValueOperations<String, String> ops = template.opsForValue();
 
 		for (int i = 0; i < numOperationsToTry; i++) {
 			ops.set("test-key-" + i, "test-value-" + i);
 		}
 	}
 
+	/**
+	 * @see DATAREDIS-332
+	 */
 	@Test
 	@Rollback
 	public void testNumberOfOperationsIsOne() {
 		tryOperations(1);
 	}
 
+	/**
+	 * @see DATAREDIS-332
+	 */
 	@Test
 	@Rollback
 	public void testNumberOfOperationsEqualToNumberOfConnections() {
 		tryOperations(MAX_CONNECTIONS);
 	}
 
+	/**
+	 * @see DATAREDIS-332
+	 */
 	@Test
 	@Rollback
 	public void testNumberOfOperationsGreaterThanNumberOfConnections() {
